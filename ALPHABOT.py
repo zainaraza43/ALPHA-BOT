@@ -4,11 +4,34 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 import random
+from riotwatcher import LolWatcher, ApiError
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
 
+# Discord Stuff
+TOKEN = os.getenv('DISCORD_TOKEN')
 client = commands.Bot(command_prefix='!')
+
+# Riot Stuff
+riot_key = os.getenv('RIOT_TOKEN')
+watcher = LolWatcher(riot_key)
+
+# Tyler1 League information
+my_region = 'na1'
+
+TOP_ACCOUNT = watcher.summoner.by_name(my_region, 'HULKSMASH1337')
+JG_ACCOUNT = watcher.summoner.by_name(my_region, 'BUZZLIGHTYEAR99')
+ADC_ACCOUNT = watcher.summoner.by_name(my_region, 'S8 IS SO FUN')
+
+print(TOP_ACCOUNT)
+print(TOP_ACCOUNT['id'])
+
+TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
+JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
+ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
+
+print(TOP_ACCOUNT_STATS)
+print(TOP_ACCOUNT_STATS[0]['tier'])
 
 
 @client.event
@@ -20,9 +43,6 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
-    # if message.author.name == "Extreme":
-    #    await message.channel.send("shut up retard")
 
     await client.process_commands(message)
 
@@ -60,6 +80,7 @@ async def title(ctx):
                  "GENETIC ANOMALY BULLY TOP PLAYER IN WAY !! MOVE !! UNRANKED TO CHALLENGER TOP LANE !!!"]
     await ctx.send(f'{random.choice(responses)}')
 
+
 @client.command()
 async def meme(ctx):
     responses = [
@@ -92,5 +113,14 @@ async def meme(ctx):
         "https://cdn.discordapp.com/attachments/421865297285480460/764686909263314974/18KxlZ0.png"
     ]
     await ctx.send(f'{random.choice(responses)}')
+
+
+@client.command()
+async def rank(ctx):
+    accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
+    for account in accounts:
+        await ctx.send(
+            f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP.')
+
 
 client.run(TOKEN)
