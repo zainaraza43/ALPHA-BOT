@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import random
 from riotwatcher import LolWatcher, ApiError
+from twitchAPI.twitch import Twitch
 
 load_dotenv()
 
@@ -16,6 +17,13 @@ client = commands.Bot(command_prefix='!')
 riot_key = os.getenv('RIOT_TOKEN')
 watcher = LolWatcher(riot_key)
 
+# Twitch Stuff
+twitch_key = os.getenv('TWITCH_TOKEN')
+secret_key = os.getenv('TWITCH_SECRET_TOKEN')
+
+twitch = Twitch(twitch_key, secret_key)
+twitch.authenticate_app([])
+
 # Tyler1 League information
 my_region = 'na1'
 
@@ -23,15 +31,9 @@ TOP_ACCOUNT = watcher.summoner.by_name(my_region, 'HULKSMASH1337')
 JG_ACCOUNT = watcher.summoner.by_name(my_region, 'BUZZLIGHTYEAR99')
 ADC_ACCOUNT = watcher.summoner.by_name(my_region, 'S8 IS SO FUN')
 
-print(TOP_ACCOUNT)
-print(TOP_ACCOUNT['id'])
-
 TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
 JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
 ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
-
-print(TOP_ACCOUNT_STATS)
-print(TOP_ACCOUNT_STATS[0]['tier'])
 
 
 @client.event
@@ -47,7 +49,7 @@ async def on_message(message):
     await client.process_commands(message)
 
 
-@client.command()
+@client.command(aliases=['src'])
 async def source(ctx):
     await ctx.send("THE SOURCE CODE FOR THE MOST ALPHA DISCORD BOT! WIN !!: https://github.com/zainaraza43/ALPHA-BOT")
 
@@ -115,12 +117,21 @@ async def meme(ctx):
     await ctx.send(f'{random.choice(responses)}')
 
 
-@client.command()
+@client.command(aliases=['Rank'])
 async def rank(ctx):
     accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
     for account in accounts:
         await ctx.send(
             f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP.')
 
+@client.command()
+async def live(ctx):
+    channel = twitch.search_channels("loltyler1", 1, "", False)['data'][0]
+    is_live = channel['is_live']
+    if is_live:
+        await ctx.send(f'{channel["display_name"]} is live with \"{channel["title"]}\" since {channel["started_at"]} at '
+                       f'https://www.twitch.tv/{channel["display_name"]}')
+    else:
+        await ctx.send(f'{channel["display_name"]}\'s dorm was tragically on fire and is not live.')
 
 client.run(TOKEN)
