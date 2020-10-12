@@ -35,7 +35,6 @@ TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
 JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
 ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
 
-
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -45,6 +44,9 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
+    if message.author.name == "scatter":
+        await message.channel.send("shut up ape")
 
     await client.process_commands(message)
 
@@ -88,7 +90,6 @@ async def meme(ctx):
     responses = [
         "https://cdn.discordapp.com/attachments/421865297285480460/764683875284418574/eyes.png",
         "https://tenor.com/view/tyler1-loltyler1-screaming-dead-wtf-gif-17500255",
-        "https://cdn.discordapp.com/attachments/421865297285480460/764684688852779068/tyler.png",
         "https://cdn.discordapp.com/attachments/421865297285480460/764684769312636958/pz1uVcP_d.png",
         "https://cdn.discordapp.com/attachments/421865297285480460/764684904759558174/unknown.png",
         "https://cdn.discordapp.com/attachments/421865297285480460/764684996790976532/rerrrr.PNG",
@@ -117,21 +118,41 @@ async def meme(ctx):
     await ctx.send(f'{random.choice(responses)}')
 
 
+def series_to_string(series):
+    line = ""
+    for ch in series:
+        if ch == 'W':
+            line += ":white_check_mark: / "
+        elif ch == 'L':
+            line += ":negative_squared_cross_mark: / "
+        else:
+            line += ":black_large_square: / "
+    line = line[:len(line)-2]
+    return line
+
+
 @client.command(aliases=['Rank'])
 async def rank(ctx):
     accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
     for account in accounts:
-        await ctx.send(
-            f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP.')
+        if account[0]["leaguePoints"] == 100:
+            await ctx.send(
+                f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP. PROMIES SERIES: ({series_to_string(account[0]["miniSeries"]["progress"])})')
+        else:
+            await ctx.send(
+                f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP.')
+
 
 @client.command()
 async def live(ctx):
-    channel = twitch.search_channels("loltyler1", 1, "", False)['data'][0]
-    is_live = channel['is_live']
+    twitchChannel = twitch.search_channels("loltyler1", 1, "", False)['data'][0]
+    is_live = twitchChannel['is_live']
     if is_live:
-        await ctx.send(f'{channel["display_name"]} is live with \"{channel["title"]}\" since {channel["started_at"]} at '
-                       f'https://www.twitch.tv/{channel["display_name"]}')
+        await ctx.send(
+            f'{twitchChannel["display_name"]} is live with \"{twitchChannel["title"]}\" since {twitchChannel["started_at"]} at '
+            f'https://www.twitch.tv/{twitchChannel["display_name"]}')
     else:
-        await ctx.send(f'{channel["display_name"]}\'s dorm was tragically on fire and is not live.')
+        await ctx.send(f'{twitchChannel["display_name"]}\'s dorm was tragically on fire and is not live.')
+
 
 client.run(TOKEN)
