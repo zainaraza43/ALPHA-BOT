@@ -1,6 +1,7 @@
 # ALPHABOT.py
 import discord
 from discord.ext import commands
+import asyncio
 import os
 from dotenv import load_dotenv
 import random
@@ -35,6 +36,11 @@ TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
 JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
 ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
 
+TOP_MATCHES = watcher.match.matchlist_by_account(my_region, TOP_ACCOUNT['accountId'])
+JG_MATCHES = watcher.match.matchlist_by_account(my_region, JG_ACCOUNT['accountId'])
+ADC_MATCHES = watcher.match.matchlist_by_account(my_region, ADC_ACCOUNT['accountId'])
+
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -47,6 +53,9 @@ async def on_message(message):
 
     if message.author.name == "scatter":
         await message.channel.send("shut up ape")
+
+    league_activity_channel = client.get_channel(765830438563348510)
+    # await league_activity_channel.send('testing')
 
     await client.process_commands(message)
 
@@ -81,7 +90,8 @@ async def title(ctx):
                  "LEGENDARY LARGE FANTASTIC ! ALL EQUAL ME ! toaster oven !!! UNRANKED TO CHALLENGER TOP LANE !!!",
                  "DOMINATING WAYS TO DIAMOND ! BEAST AND BONKERS !!! UNRANKED TO CHALLENGER TOP LANE !!!",
                  "FOCUS SPICE INSPIRATIONAL DEMOLISH CLASSIC ! UNRANKED TO CHALLENGER TOP LANE !!!",
-                 "GENETIC ANOMALY BULLY TOP PLAYER IN WAY !! MOVE !! UNRANKED TO CHALLENGER TOP LANE !!!"]
+                 "GENETIC ANOMALY BULLY TOP PLAYER IN WAY !! MOVE !! UNRANKED TO CHALLENGER TOP LANE !!!",
+                 "CLOBBERING TIME !! MOVE IT OR DOWN GO !!! IMMACULATE MACHO !"]
     await ctx.send(f'{random.choice(responses)}')
 
 
@@ -124,16 +134,17 @@ def series_to_string(series):
         if ch == 'W':
             line += ":white_check_mark: / "
         elif ch == 'L':
-            line += ":negative_squared_cross_mark: / "
+            line += ":x: / "
         else:
             line += ":black_large_square: / "
-    line = line[:len(line)-2]
+    line = line[:len(line) - 2]
     return line
 
 
 @client.command(aliases=['Rank'])
 async def rank(ctx):
     accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
+
     for account in accounts:
         if account[0]["leaguePoints"] == 100:
             await ctx.send(
@@ -155,4 +166,13 @@ async def live(ctx):
         await ctx.send(f'{twitchChannel["display_name"]}\'s dorm was tragically on fire and is not live.')
 
 
+async def update_activity():
+    all_matches = [TOP_MATCHES, JG_MATCHES, ADC_MATCHES]
+    while not client.is_closed():
+        await asyncio.sleep(1)
+        for match in all_matches:
+            print(match['matches'][0])
+
+
+client.loop.create_task(update_activity())
 client.run(TOKEN)
