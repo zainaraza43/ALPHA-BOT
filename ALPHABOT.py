@@ -32,10 +32,6 @@ TOP_ACCOUNT = watcher.summoner.by_name(my_region, 'HULKSMASH1337')
 JG_ACCOUNT = watcher.summoner.by_name(my_region, 'BUZZLIGHTYEAR99')
 ADC_ACCOUNT = watcher.summoner.by_name(my_region, 'S8 IS SO FUN')
 
-TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
-JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
-ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
-
 TOP_MATCHES = watcher.match.matchlist_by_account(my_region, TOP_ACCOUNT['accountId'])
 JG_MATCHES = watcher.match.matchlist_by_account(my_region, JG_ACCOUNT['accountId'])
 ADC_MATCHES = watcher.match.matchlist_by_account(my_region, ADC_ACCOUNT['accountId'])
@@ -143,12 +139,17 @@ def series_to_string(series):
 
 @client.command(aliases=['Rank'])
 async def rank(ctx):
+
+    TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
+    JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
+    ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
+
     accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
 
     for account in accounts:
         if account[0]["leaguePoints"] == 100:
             await ctx.send(
-                f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP. PROMIES SERIES: ({series_to_string(account[0]["miniSeries"]["progress"])})')
+                f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP. PROMOTION SERIES: ({series_to_string(account[0]["miniSeries"]["progress"])})')
         else:
             await ctx.send(
                 f'{account[0]["summonerName"]} is {account[0]["tier"]} {account[0]["rank"]} {account[0]["leaguePoints"]} LP.')
@@ -171,7 +172,7 @@ async def update_activity():
     while not client.is_closed():
         await asyncio.sleep(1)
         for match in all_matches:
-            print(match['matches'][0])
+            print(match['matches'][0]['champion'])
 
 
 client.loop.create_task(update_activity())
