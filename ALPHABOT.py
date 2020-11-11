@@ -48,7 +48,7 @@ async def on_message(message):
         return
 
     if message.author.name == "! scatter":
-        await message.channel.send("shut up ape")
+        await message.channel.send("^ this guy is a retard")
 
     league_activity_channel = client.get_channel(765830438563348510)
     # await league_activity_channel.send('testing')
