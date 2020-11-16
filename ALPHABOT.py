@@ -41,10 +41,12 @@ my_region = 'na1'
 TOP_ACCOUNT = watcher.summoner.by_name(my_region, 'HULKSMASH1337')
 JG_ACCOUNT = watcher.summoner.by_name(my_region, 'BUZZLIGHTYEAR99')
 ADC_ACCOUNT = watcher.summoner.by_name(my_region, 'S8 IS SO FUN')
+MISC_ACCOUNT = watcher.summoner.by_name(my_region, 'T1 OK GOOD YES')
 
 TOP_MATCHES = watcher.match.matchlist_by_account(my_region, TOP_ACCOUNT['accountId'])
 JG_MATCHES = watcher.match.matchlist_by_account(my_region, JG_ACCOUNT['accountId'])
 ADC_MATCHES = watcher.match.matchlist_by_account(my_region, ADC_ACCOUNT['accountId'])
+MISC_MATCHES = watcher.match.matchlist_by_account(my_region, MISC_ACCOUNT['accountId'])
 
 
 @client.event
@@ -187,8 +189,9 @@ async def rank(ctx):
     TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
     JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
     ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
+    MISC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, MISC_ACCOUNT['id'])
 
-    accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS]
+    accounts = [TOP_ACCOUNT_STATS, JG_ACCOUNT_STATS, ADC_ACCOUNT_STATS, MISC_ACCOUNT_STATS]
 
     for account in accounts:
         if account[0]["leaguePoints"] == 100:
