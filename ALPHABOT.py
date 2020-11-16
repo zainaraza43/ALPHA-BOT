@@ -213,7 +213,6 @@ async def live(ctx):
 
 @client.command()
 async def help(ctx):
-    author = ctx.message.author
     embed = discord.Embed(
         title="📚 Help",
         colour=discord.Color.red()
@@ -228,7 +227,7 @@ async def help(ctx):
     embed.add_field(name=f'**title**\n`{get_prefix(client, ctx)}title`', value='Randomly displays one of tyler1\'s stream titles!', inline=False)
     embed.add_field(name=f'**help**\n`{get_prefix(client, ctx)}help`', value='Shows this message!', inline=False)
 
-    await author.send(embed=embed)
+    await ctx.send(embed=embed)
 
 
 async def update_activity():
