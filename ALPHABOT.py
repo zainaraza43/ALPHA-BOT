@@ -1,7 +1,7 @@
 # ALPHABOT.py
-import discord
 from discord.ext import commands
-import asyncio
+import discord
+import json, asyncio
 import os
 from dotenv import load_dotenv
 import random
@@ -12,7 +12,17 @@ load_dotenv()
 
 # Discord Stuff
 TOKEN = os.getenv('DISCORD_TOKEN')
-client = commands.Bot(command_prefix='!')
+
+
+def get_prefix(client, message):
+    with open('prefixes.json', 'r') as file:
+        prefixes = json.load(file)
+
+    return prefixes[str(message.guild.id)]
+
+
+client = commands.Bot(command_prefix=get_prefix)
+client.remove_command('help')
 
 # Riot Stuff
 riot_key = os.getenv('RIOT_TOKEN')
@@ -39,21 +49,43 @@ ADC_MATCHES = watcher.match.matchlist_by_account(my_region, ADC_ACCOUNT['account
 
 @client.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+    print(f'SUP SUP {client.user} IS HERE BITCH!! WIN!')
 
 
 @client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@commands.has_permissions(administrator=True)
+async def on_guild_join(guild):
+    with open('prefixes.json', 'r') as file:
+        prefixes = json.load(file)
 
-    if message.author.name == "! scatter":
-        await message.channel.send("^ this guy is a retard")
+    prefixes[str(guild.id)] = '!'
 
-    league_activity_channel = client.get_channel(765830438563348510)
-    # await league_activity_channel.send('testing')
+    with open('prefixes.json', 'w') as file:
+        json.dump(prefixes, file, indent=4)
 
-    await client.process_commands(message)
+
+@client.event
+async def on_guild_remove(guild):
+    with open('prefixes.json', 'r') as file:
+        prefixes = json.load(file)
+
+    prefixes.pop([str(guild.id)])
+
+    with open('prefixes.json', 'w') as file:
+        json.dump(prefixes, file, indent=4)
+
+
+@client.command()
+async def changeprefix(ctx, prefix):
+    with open('prefixes.json', 'r') as file:
+        prefixes = json.load(file)
+
+    prefixes[str(ctx.guild.id)] = prefix
+
+    with open('prefixes.json', 'w') as file:
+        json.dump(prefixes, file, indent=4)
+
+    await ctx.send(f'Prefix changed to `{prefix}`!')
 
 
 @client.command(aliases=['src'])
@@ -138,14 +170,14 @@ def series_to_string(series):
 
 
 @client.command(aliases=['op.gg'])
-async def opgg(ctx, region='', *args):
+async def opgg(ctx, region='', *summoner_name):
     regions = ['na', 'kr', 'jp', 'euw', 'eune', 'oce', 'br', 'las', 'lan', 'ru', 'tr']
     region = region.lower()
     if region in regions:
         if region != 'kr':
-            await ctx.send(f'https://{region}.op.gg/summoner/userName={"+".join(args)}')
+            await ctx.send(f'https://{region}.op.gg/summoner/userName={"+".join(summoner_name)}')
         else:
-            await ctx.send(f'https://www.op.gg/summoner/userName={"+".join(args)}')
+            await ctx.send(f'https://www.op.gg/summoner/userName={"+".join(summoner_name)}')
     else:
         await ctx.send(f'Incorrect format! it\'s `!opgg <region> <username>`')
 
@@ -177,6 +209,26 @@ async def live(ctx):
             f'https://www.twitch.tv/{twitchChannel["display_name"]}')
     else:
         await ctx.send(f'{twitchChannel["display_name"]}\'s dorm was tragically on fire and is not live.')
+
+
+@client.command()
+async def help(ctx):
+    author = ctx.message.author
+    embed = discord.Embed(
+        title="📚 Help",
+        colour=discord.Color.red()
+    )
+
+    embed.add_field(name=f'**live**\n`{get_prefix(client, ctx)}live`', value='Tells if tyler1 is live or not. If he is then will link and give additional info!', inline=False)
+    embed.add_field(name=f'**meme**\n`{get_prefix(client, ctx)}meme`', value='Displays a random tyler1 related meme!', inline=False)
+    embed.add_field(name=f'**opgg**\n`{get_prefix(client, ctx)}opgg <region> <summoner name>`', value='Links the op.gg page of any League of Legends Player!', inline=False)
+    embed.add_field(name=f'**changeprefix**\n`{get_prefix(client, ctx)}changeprefix <new prefix>`', value='(ADMIN ONLY) Changes the bot\'s server prefix!', inline=False)
+    embed.add_field(name=f'**rank**\n`{get_prefix(client, ctx)}rank`', value='Displays the ranks of all of tyler1\'s active accounts!', inline=False)
+    embed.add_field(name=f'**src**\n`{get_prefix(client, ctx)}src`', value='Links the source code to ALPHA BOT, contributing is encouraged!', inline=False)
+    embed.add_field(name=f'**title**\n`{get_prefix(client, ctx)}title`', value='Randomly displays one of tyler1\'s stream titles!', inline=False)
+    embed.add_field(name=f'**help**\n`{get_prefix(client, ctx)}help`', value='Shows this message!', inline=False)
+
+    await author.send(embed=embed)
 
 
 async def update_activity():
