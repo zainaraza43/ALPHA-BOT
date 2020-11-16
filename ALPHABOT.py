@@ -137,9 +137,21 @@ def series_to_string(series):
     return line
 
 
+@client.command(aliases=['op.gg'])
+async def opgg(ctx, region='', *args):
+    regions = ['na', 'kr', 'jp', 'euw', 'eune', 'oce', 'br', 'las', 'lan', 'ru', 'tr']
+    region = region.lower()
+    if region in regions:
+        if region != 'kr':
+            await ctx.send(f'https://{region}.op.gg/summoner/userName={"+".join(args)}')
+        else:
+            await ctx.send(f'https://www.op.gg/summoner/userName={"+".join(args)}')
+    else:
+        await ctx.send(f'Incorrect format! it\'s `!opgg <region> <username>`')
+
+
 @client.command(aliases=['Rank'])
 async def rank(ctx):
-
     TOP_ACCOUNT_STATS = watcher.league.by_summoner(my_region, TOP_ACCOUNT['id'])
     JG_ACCOUNT_STATS = watcher.league.by_summoner(my_region, JG_ACCOUNT['id'])
     ADC_ACCOUNT_STATS = watcher.league.by_summoner(my_region, ADC_ACCOUNT['id'])
@@ -171,8 +183,8 @@ async def update_activity():
     all_matches = [TOP_MATCHES, JG_MATCHES, ADC_MATCHES]
     while not client.is_closed():
         await asyncio.sleep(1)
-        for match in all_matches:
-            print(match['matches'][0]['champion'])
+        # for match in all_matches:
+        #    print(match['matches'][0]['champion'])
 
 
 client.loop.create_task(update_activity())
