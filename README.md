@@ -7,6 +7,6 @@ ALPHA BOT is a Discord bot that is essentially a fan bot of popular Twitch strea
 and his multiple social meida and League of Legends accounts!
 
 ## Want to Contribute?
-Go ahead! Contrirbuting is encouraged!
+Go ahead! Contributing is encouraged!
 
 Dependencies list will be up when I'm feeling less lazy.
