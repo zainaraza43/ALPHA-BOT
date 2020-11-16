@@ -53,7 +53,6 @@ async def on_ready():
 
 
 @client.event
-@commands.has_permissions(manage_messages=True)
 async def on_guild_join(guild):
     with open('prefixes.json', 'r') as file:
         prefixes = json.load(file)
@@ -76,6 +75,7 @@ async def on_guild_remove(guild):
 
 
 @client.command()
+@commands.has_permissions(administrator=True)
 async def changeprefix(ctx, prefix):
     with open('prefixes.json', 'r') as file:
         prefixes = json.load(file)
