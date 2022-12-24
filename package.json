@@ -1,0 +1,20 @@
+{
+  "name": "alpha-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/bot.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zainaraza43/ALPHA-BOT.git"
+  },
+  "keywords": [],
+  "author": "zain raza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zainaraza43/ALPHA-BOT/issues"
+  },
+  "homepage": "https://github.com/zainaraza43/ALPHA-BOT#readme"
+}
