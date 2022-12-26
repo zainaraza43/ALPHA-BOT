@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/zainaraza43/ALPHA-BOT/issues"
   },
-  "homepage": "https://github.com/zainaraza43/ALPHA-BOT#readme"
+  "homepage": "https://github.com/zainaraza43/ALPHA-BOT#readme",
+  "dependencies": {
+    "@discordjs/rest": "^1.5.0",
+    "chalk": "^4.1.2",
+    "discord-api-types": "^0.37.24",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "shieldbow": "^1.6.0"
+  }
 }
